@@ -4,13 +4,20 @@
     use App\Http\Controllers\WalletController;
     use App\Http\Controllers\TransactionController;
     use Illuminate\Support\Facades\Route;
+    use App\Models\Transaction;
+    use Illuminate\Support\Facades\Auth;
 
     Route::get('/', function () {
         return view('welcome');
     });
 
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $totalBalance = Auth::user()->wallets()->sum('balance');
+        $recentTransactions = Transaction::whereHas('wallet', function($query) {
+            $query->where('user_id', Auth::id());
+        })->with('wallet')->latest()->take(5)->get();
+
+        return view('dashboard', compact('totalBalance', 'recentTransactions'));
     })->middleware(['auth', 'verified'])->name('dashboard');
 
     Route::middleware('auth')->group(function () {
