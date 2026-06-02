@@ -19,7 +19,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-use App\HttpControllers\WalletController;
+use App\Http\Controllers\WalletController;
 Route::middleware(['auth'])->group(function() {
     Route::resource('wallets', WalletController::class);
 });
