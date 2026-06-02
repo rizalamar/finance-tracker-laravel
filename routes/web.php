@@ -18,3 +18,8 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+use App\HttpControllers\WalletController;
+Route::middleware(['auth'])->group(function() {
+    Route::resource('wallets', WalletController::class);
+});
