@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Transaction;
 use App\Models\Wallet;
 use Illuminate\Http\Request;
-use Illuminate\Support\Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class TransactionController extends Controller
@@ -24,7 +24,7 @@ class TransactionController extends Controller
 
     public function store(Request $request){
         $request->validate([
-            'wallet_id' => 'required|exist:wallets,id',
+            'wallet_id' => 'required|exists:wallets,id',
             'type' => 'required|in:income,expense',
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:255',
@@ -35,7 +35,6 @@ class TransactionController extends Controller
         DB::transaction(function() use ($request) {
             $transaction = Transaction::create($request->all());
             $wallet = Wallet::find($request->wallet_id);
-
             if($request->type === 'income'){
                 $wallet->increment('balance', $request->amount);
             } else {
