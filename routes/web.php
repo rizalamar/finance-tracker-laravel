@@ -13,13 +13,16 @@
 
     Route::get('/dashboard', function () {
         $totalBalance = Auth::user()->wallets()->sum('balance');
+        $totalExpense = Transaction::whereHas('wallet', function($query) {
+            $query->where('user_id', Auth::id());
+        })->where('type', 'expense')->sum('amount');
+
         $recentTransactions = Transaction::whereHas('wallet', function($query) {
             $query->where('user_id', Auth::id());
         })->with('wallet')->latest()->take(5)->get();
 
-        return view('dashboard', compact('totalBalance', 'recentTransactions'));
+        return view('dashboard', compact('totalBalance', 'totalExpense', 'recentTransactions'));
     })->middleware(['auth', 'verified'])->name('dashboard');
-
     Route::middleware('auth')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
