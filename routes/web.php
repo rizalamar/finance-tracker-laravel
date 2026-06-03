@@ -12,7 +12,8 @@
     });
 
     Route::get('/dashboard', function () {
-        $totalBalance = Auth::user()->wallets()->sum('balance');
+        $wallets = Auth::user()->wallets;
+        $totalBalance = $wallets->sum('balance');
         $totalExpense = Transaction::whereHas('wallet', function($query) {
             $query->where('user_id', Auth::id());
         })->where('type', 'expense')->sum('amount');
@@ -21,9 +22,8 @@
             $query->where('user_id', Auth::id());
         })->with('wallet')->latest()->take(5)->get();
 
-        return view('dashboard', compact('totalBalance', 'totalExpense', 'recentTransactions'));
-    })->middleware(['auth', 'verified'])->name('dashboard');
-    Route::middleware('auth')->group(function () {
+        return view('dashboard', compact('wallets', 'totalBalance', 'totalExpense', 'recentTransactions'));
+    })->middleware(['auth', 'verified'])->name('dashboard');    Route::middleware('auth')->group(function () {
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
