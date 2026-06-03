@@ -7,7 +7,7 @@
 
   <div class="py-12">
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="p-6 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+      <div class="p-6 bg-white shadow-sm sm:rounded-lg">
 
       <h3 class="mb-4 text-lg font-medium text-gray-900">Add New Wallet</h3>
 
@@ -35,29 +35,36 @@
 
       <!-- List Wallet -->
       <h3 class="mb-4 text-lg font-medium text-gray-900">Your Wallets</h3>
-      <div class="overflow-x-auto">
-              <table class="min-w-full border divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                      <tr>
-                          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Wallet Name</th>
-                          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Balance</th>
-                          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Created At</th>
-                      </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                      @forelse($wallets as $wallet)
-                      <tr>
-                          <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{{ $wallet->name }}</td>
-                          <td class="px-6 py-4 text-sm font-bold text-green-600 whitespace-nowrap">Rp {{ number_format($wallet->balance, 0, ',', '.') }}</td>
-                          <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">{{$wallet->created_at->format('d M Y') }}</td>
-                      </tr>
-                      @empty
-                      <tr>
-                          <td colspan="3" class="px-6 py-4 text-center text-gray-500">No wallets found. Create one above!</td>
-                      </tr>
-                      @endforelse
-                  </tbody>
-              </table>
+      <div class="relative overflow-y-auto border rounded-lg max-h-96">
+            <table class="min-w-full border divide-y divide-gray-200">
+                <thead class="sticky top-0 z-10 shadow-sm bg-gray-50">
+                    <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">No</th>
+                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Wallet Name</th>
+                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Balance</th>
+                    <th class="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                @forelse($wallets as $index => $wallet)
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ $index + 1 }}</td>
+                    <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">{{ $wallet->name }}</td>
+                    <td class="px-6 py-4 text-sm font-bold text-green-600 whitespace-nowrap">Rp {{ number_format($wallet->balance, 0, ',', '.') }}</td>
+                    <td class="flex justify-end px-6 py-4 space-x-2 text-sm font-medium text-right">
+                        <form action="{{ route('wallets.destroy', $wallet) }}" method="POST" onsubmit="return confirm('Are you sure?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-600 hover:text-red-900">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                    @empty
+                    <tr>
+                        <td colspan="3" class="px-6 py-4 text-center text-gray-500">No wallets found. Create one above!</td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
           </div>
       </div>
     </div>

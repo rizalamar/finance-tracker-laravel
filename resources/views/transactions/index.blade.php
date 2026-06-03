@@ -7,7 +7,7 @@
   
   <div class="py-12">
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-      <div class="p-8 overflow-hidden bg-white shadow-sm sm:rounded-lg">
+      <div class="p-8 bg-white border-gray-100 shadow-sm sm:rounded-lg">
         <h3 class="mb-4 text-lg font-medium text-gray-900">Record New Transaction</h3>
 
         <form action="{{ route('transactions.store') }}" method="POST" class="pb-10 mb-10 space-y-4 border-b border-gray-200">
@@ -34,7 +34,7 @@
               </div>
               <div class="md:col-span-2">
                 <label class="block text-sm font-medium text-gray-700">Description</label>
-                <input type="text" name="description" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500">
+                <input type="text" name="description" placeholder="e.g. Buy Groceries" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500">
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700">Date</label>
@@ -50,28 +50,38 @@
         </form>
 
         <h3 class="mb-4 text-lg font-medium text-gray-900">History</h3>
-        <table class="min-w-full border divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Date</th>
-              <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Wallet</th>
-              <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Description</th>
-              <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Amount</th>
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            @foreach($transactions as $trx)
-            <tr>
-              <td class="px-6 py-4 text-sm">{{\Carbon\Carbon::parse($trx->transaction_date)->format('d M Y') }}</td>
-              <td class="px-6 py-4 text-sm text-gray-600">{{ $trx->wallet->name}}</td>
-              <td class="px-6 py-4 text-sm">{{ $trx->description ?? '-' }}</td>
-              <td class="px-6 py-4 text-sm font-bold {{ $trx->type == 'income' ? 'text-green-600' : 'text-red-600' }}">
-                {{ $trx->type == 'income' ? '+' : '-' }} Rp {{number_format($trx->amount, 0, ',', '.') }}
-              </td>
-            </tr>
-              @endforeach
-          </tbody>
-        </table>
+        <div class="overflow-y-auto border border-gray-200 rounded-lg max-h-[450px]">
+          <table class="min-w-full border divide-y divide-gray-200">
+            <thead class="sticky top-0 bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">No</th>
+                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Wallet</th>
+                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Description</th>
+                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Amount</th>
+                <th class="px-6 py-3 text-xs font-medium text-right text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              @foreach($transactions as $index => $trx)
+              <tr>
+                <td class="px-6 py-4 text-sm text-gray-400">{{ $index + 1 }}</td>
+                <td class="px-6 py-4 text-sm text-gray-600">{{ $trx->wallet->name}}</td>
+                <td class="px-6 py-4 text-sm">{{ $trx->description ?? '-' }}</td>
+                <td class="px-6 py-4 text-sm font-bold {{ $trx->type == 'income' ? 'text-green-600' : 'text-red-600' }}">
+                  {{ $trx->type == 'income' ? '+' : '-' }} Rp {{number_format($trx->amount, 0, ',', '.') }}
+                </td>
+                </td>
+                  <td class="px-6 py-4 text-sm text-right">
+                    <form action="{{ route('transactions.destroy', $trx) }}" method="POST" onsubmit="return confirm('Delete transaction?')">
+                      @csrf @method('DELETE')
+                      <button type="submit" class="font-bold text-red-500 hover:text-red-700">Delete</button>
+                    </form>
+                  </td>
+              </tr>
+                @endforeach
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

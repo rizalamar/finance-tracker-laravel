@@ -44,4 +44,27 @@ class TransactionController extends Controller
 
         return redirect()->back()->with('success', 'Transaction recorded!');
     }
+
+    public function destroy(Transaction $transaction)
+    {
+        // Ensure user owns the wallet of this transaction
+        if ($transaction->wallet->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        DB::transaction(function() use ($transaction) {
+            $wallet = $transaction->wallet;
+
+            // Reverse the balance effect
+            if ($transaction->type === 'income') {
+                $wallet->decrement('balance', $transaction->amount);
+            } else {
+                $wallet->increment('balance', $transaction->amount);
+            }
+
+            $transaction->delete();
+        });
+
+        return redirect()->back()->with('success', 'Transaction deleted and balance adjusted!');
+    }
 }

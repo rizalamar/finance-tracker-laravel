@@ -13,7 +13,8 @@ class WalletController extends Controller
         return view('wallets.index', compact('wallets'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'balance' => 'required|numeric|min:0',
@@ -23,4 +24,32 @@ class WalletController extends Controller
 
         return redirect()->back()->with('success', 'Wallet created successfully!');
     }
-}
+
+    public function edit(Wallet $wallet)
+    {
+        $this->authorize('update', $wallet);
+        return view('wallets.edit', compact('wallet'));
+    }
+
+    public function update(Request $request, Wallet $wallet)
+    {
+        $this->authorize('update', $wallet);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'balance' => 'required|numeric|min:0',
+        ]);
+
+        $wallet->update($request->all());
+
+        return redirect()->route('wallets.index')->with('success', 'Wallet updated successfully!');
+    }
+
+    public function destroy(Wallet $wallet)
+    {
+        $this->authorize('delete', $wallet);
+        $wallet->delete();
+
+        return redirect()->back()->with('success', 'Wallet deleted successfully!');
+    }
+    }
